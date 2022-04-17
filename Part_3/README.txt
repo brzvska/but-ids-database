@@ -1,1 +1,3 @@
-
+#### Part 3 - SQL script with SELECT queries
++ *SQL script that first creates the base database schema objects and populates the tables with sample data (just like the script in step 2) and then executes several SELECT queries.*
++ *Specifically, this script must contain at least two queries using a __join of two tables__, one using a __join of three tables__, two queries with a __GROUP BY clause and an aggregate function__, one query containing the __EXISTS predicate__, and one query with an __IN predicate with nested select__ (not IN with constant data set). For each of the queries, it must be clearly described (in the SQL code comment) what data the query is looking for (what its function is in the application).*

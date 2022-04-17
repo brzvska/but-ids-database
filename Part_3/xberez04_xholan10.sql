@@ -227,25 +227,19 @@ INSERT INTO contains VALUES (3, 4, 1);
 
 --------------------------------------------------------------------------- STATEMENTS -----------------------------------------------------------------------------------------
 SELECT SUM(inStock) PC_in_stock FROM category c NATURAL JOIN product WHERE c.categoryname = 'Počítače a notebooky'; 
-            -- vypise celkovy pocet zbozi z kategorie "Pocitace a notebooky" na sklade
-            -- the statement lists the total number of goods from the category "Pocitace a notebooky" in stock
+            -- lists the total number of goods from the category "Pocitace a notebooky" in stock
 
 SELECT login FROM customer NATURAL JOIN productOrder WHERE payment = 'kartou' AND orderDate BETWEEN TO_DATE('01-01-2021') AND TO_DATE('31-12-2021');
-            -- vypise login zakazniku, kteri v roce 2021 platili za objednavku kartou
-            -- the statement lists the login of customers who paid for order by card in 2021
+            -- lists logins of customers who paid for order by card in 2021
 
 SELECT lastname, name, count(*) complaints_finished FROM username NATURAL JOIN employee NATURAL JOIN complaint GROUP BY lastname, name; 
-            -- zobrazi jmena prodavacu, kteri vyrizovali nejakou reklamaci a vypise pocet reklamaci, ktery kazdy zamestnanec vyridil
-            -- the statement lists names of employees who handled some complaint and lists the number of complaints that each employee handled
+            -- lists names of employees who made some complaint and lists the number of complaints that each employee made
             
 SELECT categoryname, SUM(inStock) in_stock FROM category NATURAL JOIN product GROUP BY categoryname ORDER BY SUM(inStock) DESC;
-            -- vypise celkovy pocet produktu v jednotlivych kategoriich skladem, serazenych od nejvetsiho poctu skladem po nejmensi
-            -- the statement lists the total number of products in stock in each category, sorted from the largest number in stock to the smallest number in stock
+            -- lists the total number of products in stock in each category, sorted from the largest number to the smallest in stock
             
 SELECT productID, productName FROM product WHERE NOT EXISTS (SELECT * FROM complaint where product.productID = complaint.productID); 
-            -- vypise productID a nazev produktu, ktery nebyl nikdy reklamovan
-            -- the statement lists the productID and the name of the product that has never been claimed
+            -- lists the product ID and its name that has never been complained
 
 SELECT lastname, name, email FROM username NATURAL JOIN customer WHERE customerID IN (SELECT customerID FROM productOrder WHERE totalPrice >= 15000.00); 
-            -- vypise prijmeni, jmeno, email zakazniku, kteri si objednali zbozi za vice jak 15 000
-            -- the statement lists the lastname, name and email of customers who ordered goods for more than 15 000
+            -- lists the lastname, name and email of customers who ordered goods for more than 15 000

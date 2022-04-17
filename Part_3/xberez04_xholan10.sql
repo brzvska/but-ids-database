@@ -241,5 +241,5 @@ SELECT categoryname, SUM(inStock) in_stock FROM category NATURAL JOIN product GR
 SELECT productID, productName FROM product WHERE NOT EXISTS (SELECT * FROM complaint where product.productID = complaint.productID); 
             -- lists the product ID and its name that has never been complained
 
-SELECT lastname, name, email FROM username NATURAL JOIN customer WHERE customerID IN (SELECT customerID FROM productOrder WHERE totalPrice >= 15000.00); 
+SELECT lastname, name, email FROM username NATURAL JOIN customer WHERE customerID IN (SELECT customerID FROM productOrder WHERE totalPrice > 15000.00); 
             -- lists the lastname, name and email of customers who ordered goods for more than 15 000

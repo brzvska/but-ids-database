@@ -255,10 +255,12 @@ SELECT lastname, name, email FROM username NATURAL JOIN customer WHERE customerI
             -- lists the lastname, name and email of customers who ordered goods for more than 15 000
 
             
--------------------------------------------------------------------------- LAST PART ----------------------------------------------------------------------------------------------
+--------------------------------------------------------- LAST PART ----------------------------------------------------------------------------------------------
 SET SERVEROUTPUT ON;
 
---TRIGGERS
+----------------------------------------------------------------------------------------------
+--TRIGGER on INSERT/UPDATE query. Controls login format in 'customer' table.
+
 CREATE OR REPLACE TRIGGER customer_login_check
 BEFORE INSERT OR UPDATE OF login ON customer
 FOR EACH ROW
@@ -275,7 +277,8 @@ BEGIN
 END;
 /
 
----------------------------------------
+---------------------------------------------------------------------------------------------
+--TRIGGER on INSERT/UPDATE query. Prints out info about price changes.
 
 CREATE OR REPLACE TRIGGER price_changes
 BEFORE INSERT OR UPDATE OF price ON product
@@ -305,7 +308,8 @@ UPDATE product
     SET price = 5799.90
 WHERE productID = 1;
 
----------------------------------------
+--------------------------------------------------------------------------------------------
+--Procedure (using CURSOR) for counting percentage of fired employees from 'employee' table.
 
 CREATE OR REPLACE PROCEDURE percentage_fired
     IS
@@ -342,7 +346,8 @@ END;
    
 EXEC percentage_fired;
 
----------------------------------
+------------------------------------------------------------------------------------------
+--Procedure (using CURSOR) for counting an average age of employees from 'employee' table.
 
 CREATE OR REPLACE PROCEDURE avgAgeEmployees AS
     emp employee%rowtype;
@@ -385,7 +390,8 @@ END;
     
 EXEC avgAgeEmployees;    
     
--------------------------
+--------------------------------------------------------------------------------------------
+--VIEW on customers from Brno from 'username' and 'customer' tables.
 
 CREATE MATERIALIZED VIEW customers_living_in_Brno AS
     SELECT  lastname,
@@ -396,7 +402,8 @@ CREATE MATERIALIZED VIEW customers_living_in_Brno AS
     
 SELECT * FROM customers_living_in_Brno;
 
---------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+--RIGHTS ASSIGNMENT to another member of the team.
 
 GRANT ALL ON complaint TO xberez04;
 GRANT ALL ON productOrder TO xberez04;

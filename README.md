@@ -9,8 +9,7 @@
 - *[1 - Entity-relationship diagram __(ERD)__, Use-Case diagram __(UCD)__](https://github.com/patriciush001/IDS/tree/main/Part_1)* 
 - *[2 - __SQL script__ for making basic objects of database scheme](https://github.com/patriciush001/IDS/tree/main/Part_2)*
 - *[3 - __SQL script__ with __SELECT__ commands](https://github.com/patriciush001/IDS/tree/main/Part_3)*
-- *4 - __SQL script__ for making advanced objects od database scheme.*
-- *5 - __Documentation__.*
+- *[4 - __SQL script__ for making advanced objects od database scheme. __Documentation.__](https://github.com/patriciush001/IDS/tree/main/Part_4)*
 
 ### Authors
 - *Anastasiia Berezovskaia (xberez04)*

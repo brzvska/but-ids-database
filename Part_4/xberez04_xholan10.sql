@@ -12,6 +12,8 @@ DROP TABLE product;
 DROP TABLE category;
 DROP TABLE contains;
 
+DROP MATERIALIZED VIEW customers_living_in_Brno;
+
 
 CREATE TABLE username
 (
@@ -131,10 +133,12 @@ INSERT INTO username (name, lastname, phoneNumber, email, address) VALUES ('Davi
 INSERT INTO username (name, lastname, phoneNumber, email, address) VALUES ('Hana', 'Buchtíková', '+420785412564', 'buchtikova@gmail.com', 'Na Dolinách 555, 301 00 Plzeň');
 INSERT INTO username (name, lastname, phoneNumber, email, address) VALUES ('Monika', 'Valášková', '+420854663247', 'valmon@gmail.com', 'Lumírova 478, 760 01 Zlín');
 INSERT INTO username (name, lastname, phoneNumber, email, address) VALUES ('Josef', 'Dvořák', '+420754125445', 'josdvor@seznam.cz', 'Hradní 160, 690 02 Břeclav');
-INSERT INTO username (name, lastname, phoneNumber, email, address) VALUES ('Jan', 'Palacký', '+420763455858', 'palac@gmail.com', 'Palackého třída 144, 612 00 Brnov');
+INSERT INTO username (name, lastname, phoneNumber, email, address) VALUES ('Jan', 'Palacký', '+420763455858', 'palac@gmail.com', 'Palackého třída 144, 612 00 Brno');
 INSERT INTO username (name, lastname, phoneNumber, email, address) VALUES ('Tomáš', 'Srbský', '+420142547999', 'tomass@seznam.cz', 'Bratislavská 2A, 602 00 Brno');
 INSERT INTO username (name, lastname, phoneNumber, email, address) VALUES ('Sofia', 'Logmanová', '+420333948260', 'sofialog@seznam.cz', 'Vodná 3, 638 00 Brno');
 INSERT INTO username (name, lastname, phoneNumber, email, address) VALUES ('František', 'Novák', '+420765454245', 'frant@gmail.com', 'Kolejní 2, 612 00 Brno');
+INSERT INTO username (name, lastname, phoneNumber, email, address) VALUES ('Marek', 'Březina', '+420608517705', 'marbre@centrum.cz', 'Dyjská 468, 669 02 Znojmo');
+INSERT INTO username (name, lastname, phoneNumber, email, address) VALUES ('Pavel', 'Plevák', '+420687774511', 'pleva@seznam.cz', 'Sadová 16, 678 01 Blansko');
 
 
 INSERT INTO employee (usernameID, dateOfBirth, nationalIdNumber, insurance, startDate, finishDate, position, salary, accountNumber)
@@ -145,6 +149,12 @@ INSERT INTO employee (usernameID, dateOfBirth, nationalIdNumber, insurance, star
 
 INSERT INTO employee (usernameID, dateOfBirth, nationalIdNumber, insurance, startDate, finishDate, position, salary, accountNumber)
     VALUES (3, '30-07-1977', 7707303978, 211, '10-10-2020', null, 'prodavač', 26000, '300200232/0800');
+    
+INSERT INTO employee (usernameID, dateOfBirth, nationalIdNumber, insurance, startDate, finishDate, position, salary, accountNumber)
+    VALUES (11, '07-10-1980', 8010073236, 209, '18-06-2018', '15-08-2020', 'skladník', 29500, '900500642/0800');
+    
+INSERT INTO employee (usernameID, dateOfBirth, nationalIdNumber, insurance, startDate, finishDate, position, salary, accountNumber)
+    VALUES (12, '19-08-1979', 7908191192, 205, '06-06-2017', '10-07-2020', 'skladník', 28000, '185464512/0600');
 
 
 INSERT INTO category (categoryName) VALUES ('Chytré hodinky');
@@ -243,3 +253,156 @@ SELECT productID, productName FROM product WHERE NOT EXISTS (SELECT * FROM compl
 
 SELECT lastname, name, email FROM username NATURAL JOIN customer WHERE customerID IN (SELECT customerID FROM productOrder WHERE totalPrice > 15000.00); 
             -- lists the lastname, name and email of customers who ordered goods for more than 15 000
+
+            
+-------------------------------------------------------------------------- LAST PART ----------------------------------------------------------------------------------------------
+SET SERVEROUTPUT ON;
+
+--TRIGGERS
+CREATE OR REPLACE TRIGGER customer_login_check
+BEFORE INSERT OR UPDATE OF login ON customer
+FOR EACH ROW
+BEGIN
+    IF (LENGTH(:NEW.login) != 8) THEN
+        RAISE_APPLICATION_ERROR(-20000, 'Error - invalid number of characters.');
+    END IF;
+    IF NOT REGEXP_LIKE(:new.login, '^x[a-z]{5}') THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Error - invalid xlogin format.');
+    END IF;
+    IF NOT REGEXP_LIKE(:new.login, '^x[a-z]{5}[0-9]{2}$') THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Error - invalid number format.');
+    END IF;
+END;
+/
+
+---------------------------------------
+
+CREATE OR REPLACE TRIGGER price_changes
+BEFORE INSERT OR UPDATE OF price ON product
+FOR EACH ROW
+DECLARE
+    difference INT;
+    priceIncrease INT;
+    priceDecrease INT;
+BEGIN
+    difference := :NEW.price - :OLD.price;
+    priceIncrease := (:NEW.price / :OLD.price * 100) - 100;
+    priceDecrease := (:OLD.price / :NEW.price * 100) - 100;
+    dbms_output.put_line(:OLD.productName);
+    dbms_output.put_line('Old price: ' || :OLD.price);
+    dbms_output.put_line('New price: ' || :NEW.price);
+    dbms_output.put_line('Price difference: ' || ABS(difference));
+    IF(:OLD.price > :NEW.price) THEN
+        dbms_output.put_line(priceDecrease || ' % discount');
+    END IF;
+    IF(:OLD.price < :NEW.price) THEN
+        dbms_output.put_line('Price increased by ' || priceIncrease || ' %');
+    END IF;
+END;
+/
+
+UPDATE product
+    SET price = 5799.90
+WHERE productID = 1;
+
+---------------------------------------
+
+CREATE OR REPLACE PROCEDURE percentage_fired
+    IS
+        emp employee%ROWTYPE;
+        totalNumberOfEmployees INT;
+        totalNumberOfFired INT;
+        percentage INT;
+        CURSOR cursor_employee is select * from employee;
+        begin
+            totalNumberOfEmployees := 0;
+            totalNumberOfFired := 0;
+            OPEN
+                cursor_employee;
+                LOOP
+                    FETCH cursor_employee into emp;
+                    EXIT WHEN cursor_employee%NOTFOUND;
+                    totalNumberOfEmployees := totalNumberOfEmployees + 1;
+                    IF (emp.finishDate is not null) THEN
+                        totalNumberOfFired := totalNumberOfFired + 1;
+                    END IF;
+                END LOOP;
+                IF totalNumberOfEmployees = 0 THEN
+                    RAISE ZERO_DIVIDE;
+                END IF;
+            CLOSE cursor_employee;
+            dbms_output.put_line('Percentage of fired employees is ' || totalNumberOfFired / totalNumberOfEmployees * 100 ||'.');
+            EXCEPTION
+                WHEN zero_divide THEN
+                    dbms_output.put_line('Can´t count percentage.');
+                WHEN OTHERS THEN
+                    dbms_output.put_line('Error');
+END;
+/    
+   
+EXEC percentage_fired;
+
+---------------------------------
+
+CREATE OR REPLACE PROCEDURE avgAgeEmployees AS
+    emp employee%rowtype;
+    ageTotal INT;
+    employeeTotal INT;
+    yearofBirth INT;
+    currentYear INT;
+    age INT;
+    CURSOR employee_cursor IS SELECT * FROM employee;
+    BEGIN
+        ageTotal := 0;
+        employeeTotal := 0;
+        OPEN employee_cursor;
+        LOOP
+            FETCH employee_cursor INTO emp;
+            EXIT WHEN employee_cursor%NOTFOUND;
+            employeeTotal := employeeTotal + 1;
+            yearofBirth := to_number(to_char(emp.dateOfBirth, 'YYYY'));
+            currentYear := to_number(to_char(sysdate, 'YYYY'));
+            IF (currentYear > yearofBirth) THEN
+                age := currentYear - yearofBirth;
+            END IF;
+            IF (currentYear < yearofBirth) THEN
+                RAISE_APPLICATION_ERROR(-20000, 'Year of birth can not be bigger than current year.');
+            END IF;
+            ageTotal := ageTotal + age;
+        END LOOP;
+        IF employeeTotal = 0 then
+            RAISE ZERO_DIVIDE;
+        END IF;
+        dbms_output.put_line('Average age of employees is ' || ageTotal  / employeeTotal || '.');
+        CLOSE employee_cursor;
+        EXCEPTION
+            WHEN ZERO_DIVIDE THEN
+                 RAISE_APPLICATION_ERROR(-20000, 'Can not count average age.');
+            WHEN OTHERS THEN
+                 raise_application_error(-20001, 'Unexpected error.');
+END;
+/
+    
+EXEC avgAgeEmployees;    
+    
+-------------------------
+
+CREATE MATERIALIZED VIEW customers_living_in_Brno AS
+    SELECT  lastname,
+            name,
+            address 
+    FROM username NATURAL JOIN customer WHERE address LIKE '% Brno'
+    ORDER BY lastname, name;
+    
+SELECT * FROM customers_living_in_Brno;
+
+--------------------------------------------------------------------
+
+GRANT ALL ON complaint TO xberez04;
+GRANT ALL ON productOrder TO xberez04;
+GRANT ALL ON employee TO xberez04;
+GRANT ALL ON customer TO xberez04;
+GRANT ALL ON username TO xberez04;
+GRANT ALL ON product TO xberez04;
+GRANT ALL ON category TO xberez04;
+GRANT ALL ON contains TO xberez04;

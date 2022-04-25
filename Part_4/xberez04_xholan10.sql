@@ -316,7 +316,6 @@ CREATE OR REPLACE PROCEDURE percentage_fired
         emp employee%ROWTYPE;
         totalNumberOfEmployees INT;
         totalNumberOfFired INT;
-        percentage INT;
         CURSOR cursor_employee is select * from employee;
         begin
             totalNumberOfEmployees := 0;

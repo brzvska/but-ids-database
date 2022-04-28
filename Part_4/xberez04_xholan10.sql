@@ -400,9 +400,9 @@ END;
 EXEC avgAgeEmployees;    
     
 --------------------------------------------------------------------------------------------
--- EXPLAIN PLAN pro: - listing all product names that were claimed
---                   - number of how many times that products were claimed
--- uses joining two tables (complaint, produkt) by productID
+-- EXPLAIN PLAN pro: - listing all names of products that were complained
+--                   - number of times products were complained
+-- uses joining two tables ('complaint', 'product') by productID
 
 EXPLAIN PLAN FOR
     SELECT p.productName, count(*) AS complaintsTotal

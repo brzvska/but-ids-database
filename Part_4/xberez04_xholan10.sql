@@ -434,7 +434,7 @@ CREATE MATERIALIZED VIEW customers_living_in_Brno AS
 SELECT * FROM customers_living_in_Brno;
 
 --------------------------------------------------------------------------------------------
---RIGHTS ASSIGNMENT to another member of the team.
+--Privilegues(access rights) to another member of the team.
 
 GRANT ALL ON complaint TO xberez04;
 GRANT ALL ON productOrder TO xberez04;

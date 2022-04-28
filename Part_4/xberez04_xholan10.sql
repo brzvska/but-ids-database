@@ -400,9 +400,9 @@ END;
 EXEC avgAgeEmployees;    
     
 --------------------------------------------------------------------------------------------
--- explain plan pro: - výpis názvu všech produktů, které byly někdy reklamovány
---                   - počet, kolikrát byly dané produkty reklamovány
--- využívá spojení 2 tabulek (complaint a product) podle productID
+-- EXPLAIN PLAN pro: - listing all product names that were claimed
+--                   - number of how many times that products were claimed
+-- uses joining two tables (complaint, produkt) by productID
 
 EXPLAIN PLAN FOR
     SELECT p.productName, count(*) AS complaintsTotal
@@ -413,6 +413,7 @@ SELECT * FROM TABLE(dbms_xplan.display());
 
 
 CREATE INDEX productID_idx ON complaint(productID);
+
 EXPLAIN PLAN FOR
     SELECT p.productName, count(*) AS complaintsTotal
     FROM complaint c, product p

@@ -400,8 +400,8 @@ END;
 EXEC avgAgeEmployees;    
     
 --------------------------------------------------------------------------------------------
--- EXPLAIN PLAN pro: - listing all names of products that were complained
---                   - number of times products were complained
+-- EXPLAIN PLAN pro: - listing names of products that were complained
+--                   - number of how many times products were complained
 -- uses joining two tables ('complaint', 'product') by productID
 
 EXPLAIN PLAN FOR

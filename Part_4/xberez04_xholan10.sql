@@ -219,6 +219,9 @@ INSERT INTO productOrder (orderDate, totalPrice, address, delivery, payment, pro
 INSERT INTO productOrder (orderDate, totalPrice, address, delivery, payment, productID, employeeID, customerID) 
     VALUES ('04-08-2019', 10090.90, 'Na Dolinách 555, 301 00 Plzeň', 'DHL', 'kartou', 8, 1, 1);
     
+INSERT INTO productOrder (orderDate, totalPrice, address, delivery, payment, productID, employeeID, customerID) 
+    VALUES ('18-11-2018', 29090.50, 'Vodná 3, 638 00 Brno', 'PPL', 'kartou', 6, 1, 6);
+    
     
 INSERT INTO complaint (productID, description, submissionDate, executionDate, state, orderNumber, employeeID, customerID) 
     VALUES (6, 'zařízení nelze zapnout', '01-07-2021', '01-08-2021', 'vyřízeno', 1, 1, 3);
@@ -229,10 +232,17 @@ INSERT INTO complaint (productID, description, submissionDate, executionDate, st
 INSERT INTO complaint (productID, description, submissionDate, executionDate, state, orderNumber, employeeID, customerID) 
     VALUES (8, 'nefunkční webkamera', '05-08-2019', '05-09-2019', 'vyřízeno', 6, 3, 1);
     
+INSERT INTO complaint (productID, description, submissionDate, executionDate, state, orderNumber, employeeID, customerID) 
+    VALUES (6, 'zařízení se nenabíjí', '05-09-2021', '05-10-2021', 'vyřízeno', 7, 3, 6);
+    
     
 INSERT INTO contains VALUES (1, 6, 1);
 INSERT INTO contains VALUES (2, 2, 1);
 INSERT INTO contains VALUES (3, 4, 1);
+INSERT INTO contains VALUES (4, 3, 1);
+INSERT INTO contains VALUES (5, 9, 1);
+INSERT INTO contains VALUES (6, 8, 1);
+INSERT INTO contains VALUES (7, 6, 1);
 
 
 --------------------------------------------------------------------------- STATEMENTS -----------------------------------------------------------------------------------------
@@ -390,6 +400,27 @@ END;
 EXEC avgAgeEmployees;    
     
 --------------------------------------------------------------------------------------------
+-- explain plan pro: - výpis názvu všech produktů, které byly někdy reklamovány
+--                   - počet, kolikrát byly dané produkty reklamovány
+-- využívá spojení 2 tabulek (complaint a product) podle productID
+
+EXPLAIN PLAN FOR
+    SELECT p.productName, count(*) AS complaintsTotal
+    FROM complaint c, product p
+    WHERE c.productID = p.productID
+    GROUP BY c.productID, p.productName;
+SELECT * FROM TABLE(dbms_xplan.display());
+
+
+CREATE INDEX productID_idx ON complaint(productID);
+EXPLAIN PLAN FOR
+    SELECT p.productName, count(*) AS complaintsTotal
+    FROM complaint c, product p
+    WHERE c.productID = p.productID
+    GROUP BY c.productID, p.productName;
+SELECT * FROM TABLE(dbms_xplan.display());
+
+--------------------------------------------------------------------------------------------
 --VIEW on customers from Brno from 'username' and 'customer' tables.
 
 CREATE MATERIALIZED VIEW customers_living_in_Brno AS
@@ -412,3 +443,6 @@ GRANT ALL ON username TO xberez04;
 GRANT ALL ON product TO xberez04;
 GRANT ALL ON category TO xberez04;
 GRANT ALL ON contains TO xberez04;
+
+GRANT EXECUTE ON avgAgeEmployees TO xberez04;
+GRANT EXECUTE ON percentage_fired TO xberez04;

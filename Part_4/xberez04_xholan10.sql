@@ -423,12 +423,13 @@ SELECT * FROM TABLE(dbms_xplan.display());
 
 --------------------------------------------------------------------------------------------
 --VIEW on customers from Brno from 'username' and 'customer' tables.
+--VIEW is performed by the second member of the team (xberez04).
 
 CREATE MATERIALIZED VIEW customers_living_in_Brno AS
     SELECT  lastname,
             name,
             address 
-    FROM username NATURAL JOIN customer WHERE address LIKE '% Brno'
+    FROM xholan10.username NATURAL JOIN xholan10.customer WHERE address LIKE '% Brno'
     ORDER BY lastname, name;
     
 SELECT * FROM customers_living_in_Brno;

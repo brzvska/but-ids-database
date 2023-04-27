@@ -12,5 +12,5 @@
 - *[4 - __SQL script__ for making advanced objects od database scheme. __Documentation.__](https://github.com/patriciush001/IDS/tree/main/Part_4)*
 
 ### Authors
-- *Anastasiia Berezovskaia (xberez04)*
+- *Anastasiia Berezovska (xberez04)*
 - *Patrik Holáň (xholan10)*
